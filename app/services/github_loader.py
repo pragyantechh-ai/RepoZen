@@ -1,36 +1,39 @@
 import os
-import subprocess
+import stat
 import shutil
-from pathlib import Path
+from git import Repo
 from app.core.config import UPLOAD_DIR
 
 
-def clone_repo(github_url: str) -> str:
-    """Clone a GitHub repo and return the local path.
-    
-    Supports:
-      - https://github.com/owner/repo
-      - https://github.com/owner/repo.git
+def _force_remove_readonly(func, path, excinfo):
+    """Handle read-only files on Windows (e.g., .git/objects/pack/)."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
+def clone_repo(repo_url: str) -> str:
     """
-    # Extract repo name
-    repo_name = github_url.rstrip("/").split("/")[-1].replace(".git", "")
-    clone_path = os.path.join(UPLOAD_DIR, repo_name)
+    Clone a git repository into UPLOAD_DIR.
+    If the directory already exists, delete it first.
 
-    if os.path.exists(clone_path):
-        shutil.rmtree(clone_path)
+    Args:
+        repo_url: Git clone URL
 
-    result = subprocess.run(
-        ["git", "clone", "--depth", "1", github_url, clone_path],
-        capture_output=True, text=True,
-    )
+    Returns:
+        Path to the cloned repository
+    """
+    # Extract repo name from URL
+    repo_name = repo_url.rstrip("/").split("/")[-1].replace(".git", "")
+    dest_path = os.path.join(UPLOAD_DIR, repo_name)
 
-    if result.returncode != 0:
-        raise RuntimeError(f"Git clone failed: {result.stderr}")
+    # If already exists, force remove (handles read-only .git files on Windows)
+    if os.path.exists(dest_path):
+        shutil.rmtree(dest_path, onerror=_force_remove_readonly)
 
-    print(f"[GITHUB] Cloned {github_url} → {clone_path}")
-    return clone_path
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+    print(f"[GIT] Cloning {repo_url} → {dest_path}")
+    Repo.clone_from(repo_url, dest_path)
+    print(f"[GIT] Clone complete: {dest_path}")
 
-def get_repo_name(path: str) -> str:
-    """Derive a clean repo name from a filesystem path."""
-    return Path(path).name
+    return dest_path
