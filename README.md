@@ -32,5 +32,3 @@ POST /api/chat        ──→  session.orchestrator.process(query)
 
 DELETE /api/session/{id}  ──→  cleanup
 
-
-![Alt text](/RepoZen/UI_images/UI_interface.png "UI Interface")
