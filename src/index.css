@@ -3,45 +3,99 @@
 /* Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-:root {
-  --background: 228 20% 6%;
-  --foreground: 210 40% 95%;
+/* ── Tailwind v4: Custom Theme ─────────────────────────────────── */
+@theme {
+  --color-background: hsl(228 20% 6%);
+  --color-foreground: hsl(210 40% 95%);
+  --color-primary: hsl(250 80% 65%);
+  --color-accent: hsl(200 80% 55%);
+  --color-border: hsl(228 15% 18%);
+  --color-muted-foreground: hsl(228 15% 55%);
+  --color-secondary: hsl(228 20% 15%);
+  --color-sidebar-background: hsl(228 20% 8%);
 
-  --primary: 250 80% 65%;
-  --accent: 200 80% 55%;
+  --font-family-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-family-sans: 'Inter', system-ui, sans-serif;
 
-  --border: 228 15% 18%;
-  --sidebar-background: 228 20% 8%;
-
-  font-family: 'Inter', system-ui, sans-serif;
+  /* Animations */
+  --animate-fade-in: fade-in 0.6s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
+  --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--particle-opacity, 0.2);
+  }
+  90% {
+    opacity: var(--particle-opacity, 0.2);
+  }
+  100% {
+    transform: translateY(-10vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ── Base Styles ───────────────────────────────────────────────── */
 body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-family-sans);
 }
 
-/* Glass */
+/* ── Glass Effects ─────────────────────────────────────────────── */
 .glass {
-  background: hsla(228 20% 12% / 0.6);
+  background: hsla(228, 20%, 12%, 0.6);
   backdrop-filter: blur(20px);
-  border: 1px solid hsla(228 15% 22% / 0.3);
+  border: 1px solid hsla(228, 15%, 22%, 0.3);
 }
 
 .glass-card {
-  background: hsla(228 20% 12% / 0.4);
+  background: hsla(228, 20%, 12%, 0.4);
   backdrop-filter: blur(24px);
-  border: 1px solid hsla(228 15% 22% / 0.2);
+  border: 1px solid hsla(228, 15%, 22%, 0.2);
 }
 
-/* Gradient text */
+/* ── Text Gradient ─────────────────────────────────────────────── */
 .text-gradient {
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Glow */
+/* ── Glow ──────────────────────────────────────────────────────── */
 .glow-primary {
-  box-shadow: 0 0 30px -5px hsla(var(--primary) / 0.4);
+  box-shadow: 0 0 30px -5px hsla(250, 80%, 65%, 0.4);
 }
