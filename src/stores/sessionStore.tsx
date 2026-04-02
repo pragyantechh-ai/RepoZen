@@ -1,42 +1,58 @@
-import { create } from "zustand";
+import { createContext, useContext, useState, type ReactNode } from "react";
+
+interface RepoSummary {
+  total_pages: number;
+  languages: string[];
+  files: string[];
+}
 
 interface SessionState {
   sessionId: string | null;
   status: "idle" | "analyzing" | "ready" | "error";
   message: string;
   progress: number;
-  repoSummary: {
-    total_pages: number;
-    languages: string[];
-    files: string[];
-  } | null;
+  repoSummary: RepoSummary | null;
+}
 
+interface SessionContextValue extends SessionState {
   setSession: (id: string) => void;
-  setStatus: (status: SessionState["status"]) => void;
-  setMessage: (msg: string) => void;
+  setStatus: (s: SessionState["status"]) => void;
+  setMessage: (m: string) => void;
   setProgress: (p: number) => void;
-  setRepoSummary: (s: SessionState["repoSummary"]) => void;
+  setRepoSummary: (r: RepoSummary | null) => void;
   reset: () => void;
 }
 
-export const useSessionStore = create<SessionState>((set) => ({
+const SessionContext = createContext<SessionContextValue | null>(null);
+
+const INITIAL: SessionState = {
   sessionId: null,
   status: "idle",
   message: "",
   progress: 0,
   repoSummary: null,
+};
 
-  setSession: (id) => set({ sessionId: id }),
-  setStatus: (status) => set({ status }),
-  setMessage: (message) => set({ message }),
-  setProgress: (progress) => set({ progress }),
-  setRepoSummary: (repoSummary) => set({ repoSummary }),
-  reset: () =>
-    set({
-      sessionId: null,
-      status: "idle",
-      message: "",
-      progress: 0,
-      repoSummary: null,
-    }),
-}));
+export function SessionProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<SessionState>(INITIAL);
+
+  const value: SessionContextValue = {
+    ...state,
+    setSession: (id) => setState((s) => ({ ...s, sessionId: id })),
+    setStatus: (status) => setState((s) => ({ ...s, status })),
+    setMessage: (message) => setState((s) => ({ ...s, message })),
+    setProgress: (progress) => setState((s) => ({ ...s, progress })),
+    setRepoSummary: (repoSummary) => setState((s) => ({ ...s, repoSummary })),
+    reset: () => setState(INITIAL),
+  };
+
+  return (
+    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+  );
+}
+
+export function useSession() {
+  const ctx = useContext(SessionContext);
+  if (!ctx) throw new Error("useSession must be used within <SessionProvider>");
+  return ctx;
+}

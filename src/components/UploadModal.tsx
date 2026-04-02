@@ -33,7 +33,14 @@ const UploadModal = ({ open, onClose, onSubmit, loading }: UploadModalProps) => 
       />
 
       {/* Modal */}
-      <div className="relative glass rounded-2xl p-6 w-full max-w-md mx-4 animate-fade-in">
+      <div
+        className="relative rounded-2xl p-6 w-full max-w-md mx-4 animate-fade-in"
+        style={{
+          background: "hsla(228, 20%, 12%, 0.8)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid hsla(228, 15%, 22%, 0.4)",
+        }}
+      >
         {/* Close */}
         <button
           onClick={onClose}
@@ -48,7 +55,7 @@ const UploadModal = ({ open, onClose, onSubmit, loading }: UploadModalProps) => 
             <Github className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-display font-semibold text-foreground">
+            <h2 className="text-lg font-semibold text-foreground">
               Upload Repository
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -73,7 +80,7 @@ const UploadModal = ({ open, onClose, onSubmit, loading }: UploadModalProps) => 
         <button
           onClick={handleSubmit}
           disabled={!url.trim() || loading}
-          className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-white font-medium text-sm flex items-center justify-center gap-2 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
+          className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-white font-medium text-sm flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-100 transition-all disabled:opacity-50 disabled:hover:scale-100"
         >
           {loading ? (
             <>
