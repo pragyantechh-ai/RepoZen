@@ -17,6 +17,37 @@ export interface StatusResponse {
   } | null;
 }
 
+export interface ChatResult {
+  type?: string;
+  content?: string;
+  summary?: string;
+  changes?: Array<{
+    file_path: string;
+    original?: string;
+    modified?: string;
+    diff?: string;
+  }>;
+  debug?: {
+    bugs?: Array<{ description: string; severity?: string; fix?: string }>;
+    overall_assessment?: string;
+  };
+  test_files?: Array<{
+    file_path: string;
+    content: string;
+  }>;
+  [key: string]: unknown;
+}
+
+export interface ChatResponse {
+  session_id: string;
+  intent: string;
+  summary: string;
+  result: ChatResult;
+  validation: Record<string, unknown> | null;
+  files_referenced: string[];
+  timing: Record<string, number>;
+}
+
 export async function uploadRepoUrl(repoUrl: string): Promise<UploadResponse> {
   const res = await fetch(`${API_BASE}/upload/url`, {
     method: "POST",
@@ -35,6 +66,22 @@ export async function checkStatus(sessionId: string): Promise<StatusResponse> {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Status check failed" }));
     throw new Error(err.detail || "Status check failed");
+  }
+  return res.json();
+}
+
+export async function sendChat(
+  sessionId: string,
+  query: string
+): Promise<ChatResponse> {
+  const res = await fetch(`${API_BASE}/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: sessionId, query }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Chat failed" }));
+    throw new Error(err.detail || "Chat failed");
   }
   return res.json();
 }

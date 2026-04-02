@@ -1,9 +1,19 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
 interface RepoSummary {
   total_pages: number;
   languages: string[];
   files: string[];
+}
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  intent?: string;
+  filesReferenced?: string[];
+  timing?: Record<string, number>;
+  timestamp: number;
 }
 
 interface SessionState {
@@ -12,6 +22,8 @@ interface SessionState {
   message: string;
   progress: number;
   repoSummary: RepoSummary | null;
+  messages: ChatMessage[];
+  isGenerating: boolean;
 }
 
 interface SessionContextValue extends SessionState {
@@ -20,6 +32,8 @@ interface SessionContextValue extends SessionState {
   setMessage: (m: string) => void;
   setProgress: (p: number) => void;
   setRepoSummary: (r: RepoSummary | null) => void;
+  addMessage: (msg: ChatMessage) => void;
+  setIsGenerating: (v: boolean) => void;
   reset: () => void;
 }
 
@@ -31,19 +45,66 @@ const INITIAL: SessionState = {
   message: "",
   progress: 0,
   repoSummary: null,
+  messages: [],
+  isGenerating: false,
 };
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<SessionState>(INITIAL);
+  const [state, setState] = useState<SessionState>({ ...INITIAL });
+
+  const setSession = useCallback(
+    (id: string) => setState((prev) => ({ ...prev, sessionId: id })),
+    []
+  );
+
+  const setStatus = useCallback(
+    (status: SessionState["status"]) => setState((prev) => ({ ...prev, status })),
+    []
+  );
+
+  const setMessage = useCallback(
+    (message: string) => setState((prev) => ({ ...prev, message })),
+    []
+  );
+
+  const setProgress = useCallback(
+    (progress: number) => setState((prev) => ({ ...prev, progress })),
+    []
+  );
+
+  const setRepoSummary = useCallback(
+    (repoSummary: RepoSummary | null) =>
+      setState((prev) => ({ ...prev, repoSummary })),
+    []
+  );
+
+  const addMessage = useCallback(
+    (msg: ChatMessage) =>
+      setState((prev) => {
+        const newMessages = [...prev.messages, msg];
+        console.log("[SessionContext] addMessage, total:", newMessages.length, "latest:", msg.role, msg.content.slice(0, 50));
+        return { ...prev, messages: newMessages };
+      }),
+    []
+  );
+
+  const setIsGenerating = useCallback(
+    (isGenerating: boolean) => setState((prev) => ({ ...prev, isGenerating })),
+    []
+  );
+
+  const reset = useCallback(() => setState({ ...INITIAL, messages: [] }), []);
 
   const value: SessionContextValue = {
     ...state,
-    setSession: (id) => setState((s) => ({ ...s, sessionId: id })),
-    setStatus: (status) => setState((s) => ({ ...s, status })),
-    setMessage: (message) => setState((s) => ({ ...s, message })),
-    setProgress: (progress) => setState((s) => ({ ...s, progress })),
-    setRepoSummary: (repoSummary) => setState((s) => ({ ...s, repoSummary })),
-    reset: () => setState(INITIAL),
+    setSession,
+    setStatus,
+    setMessage,
+    setProgress,
+    setRepoSummary,
+    addMessage,
+    setIsGenerating,
+    reset,
   };
 
   return (
