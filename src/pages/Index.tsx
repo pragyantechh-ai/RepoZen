@@ -4,6 +4,7 @@ import ChatInput from "../components/ChatInput";
 import AppSidebar from "../components/AppSidebar";
 import Particles from "../components/Particles";
 import AnalysisProgress from "../components/ProgressBar";
+import ChatArea from "../components/ChatArea";
 import { useSession } from "../stores/sessionStore";
 
 const actions = [
@@ -34,14 +35,70 @@ const actions = [
 ];
 
 const Index = () => {
-  const { status } = useSession();
+  const { status, messages } = useSession();
+  const isChatMode = messages.length > 0;
 
+  console.log("[Index] render — status:", status, "messages:", messages.length, "chatMode:", isChatMode);
+
+  // ── CHAT MODE ──────────────────────────────────────────────────
+  if (isChatMode) {
+    return (
+      <div className="h-screen flex relative overflow-hidden">
+        <Particles />
+        <AppSidebar />
+
+        <div className="ml-16 flex-1 flex flex-col h-screen">
+          {/* Compact header */}
+          <div
+            className="shrink-0 flex items-center gap-3 px-6 py-3 z-10"
+            style={{
+              background: "hsla(228, 20%, 6%, 0.8)",
+              backdropFilter: "blur(12px)",
+              borderBottom: "1px solid hsla(228,15%,22%,0.2)",
+            }}
+          >
+            <h1 className="text-lg font-bold">
+              <span className="text-gradient">RepoZen</span>
+            </h1>
+            <div
+              style={{
+                width: "1px",
+                height: "16px",
+                background: "hsla(228,15%,22%,0.4)",
+              }}
+            />
+            <span className="text-xs text-muted-foreground">
+              Chat &middot; Session active
+            </span>
+          </div>
+
+          {/* Chat messages — scrollable */}
+          <ChatArea />
+
+          {/* Input pinned bottom */}
+          <div
+            className="shrink-0"
+            style={{
+              background: "hsla(228, 20%, 6%, 0.6)",
+              backdropFilter: "blur(12px)",
+              borderTop: "1px solid hsla(228,15%,22%,0.15)",
+            }}
+          >
+            <ChatInput />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── LANDING MODE ───────────────────────────────────────────────
   return (
-    <div className="min-h-screen relative">
+    <div className="h-screen flex relative overflow-hidden">
       <Particles />
       <AppSidebar />
 
-      <main className="ml-16 flex flex-col items-center justify-center min-h-screen px-6">
+      <div className="ml-16 flex-1 flex flex-col items-center justify-center px-6">
+        {/* Hero */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             <span className="text-gradient">RepoZen</span>
@@ -51,6 +108,7 @@ const Index = () => {
           </p>
         </div>
 
+        {/* Action Cards — idle only */}
         {status === "idle" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-4xl mb-12">
             {actions.map((action, i) => (
@@ -66,10 +124,12 @@ const Index = () => {
           </div>
         )}
 
+        {/* Progress bar */}
         <AnalysisProgress />
 
+        {/* Chat Input */}
         <ChatInput />
-      </main>
+      </div>
     </div>
   );
 };
