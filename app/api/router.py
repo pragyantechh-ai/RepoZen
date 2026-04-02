@@ -1,14 +1,3 @@
-"""
-RepoZen API Routes — Session-based agent pipeline.
-
-Endpoints:
-  POST /api/upload/url      — Clone a GitHub repo and start analysis
-  POST /api/upload/file     — Upload a .zip and start analysis
-  GET  /api/status/{id}     — Poll analysis status
-  POST /api/chat            — Ask a question (routes through agent pipeline)
-  DELETE /api/session/{id}  — Cleanup session
-"""
-
 import os
 import time
 import zipfile
@@ -229,6 +218,8 @@ async def chat(request: ChatRequest):
     session_manager.append_chat(
         request.session_id, "assistant", assistant_content
     )
+    
+    print(f"{result}")
 
     # ── Return ───────────────────────────────────────────────────────
     return ChatResponse(
@@ -240,6 +231,8 @@ async def chat(request: ChatRequest):
         files_referenced=response.get("files_referenced", []),
         timing=timing,
     )
+    
+    
 
 
 # ═════════════════════════════════════════════════════════════════════
