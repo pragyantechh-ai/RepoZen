@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
-from base_agent import BaseAgent
+from app.agents.base_agent import BaseAgent
 
 
 # ── Structured Output Schemas ────────────────────────────────────────

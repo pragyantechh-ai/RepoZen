@@ -12,7 +12,7 @@ This agent does NOT call the LLM — it is pure retrieval logic.
 
 from typing import Any, Dict, List, Set, Tuple
 
-from base_agent import BaseAgent
+from app.agents.base_agent import BaseAgent
 from app.services.chunking import PageIndex, MAX_CONTEXT_CHARS
 
 

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from base_agent import BaseAgent, get_llm
+from app.agents.base_agent import BaseAgent, get_llm
 from app.agents.planner import PlannerAgent
 from app.agents.retriever import RetrieverAgent
 from app.agents.generator import CodeGeneratorAgent

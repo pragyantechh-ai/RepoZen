@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
-from base_agent import BaseAgent
+from app.agents.base_agent import BaseAgent
 
 
 # ── Structured Output Schema ─────────────────────────────────────────
@@ -176,7 +176,7 @@ class PlannerAgent(BaseAgent):
         )
 
         # Normalize and validate the plan
-        return self._normalize_plan(raw_result)
+        return self.normalize_plan(raw_result)
 
     def normalize_plan(self, raw: Dict) -> Dict:
         """
@@ -197,7 +197,7 @@ class PlannerAgent(BaseAgent):
 
         # Enforce routing rules as fallback
         if not agents:
-            agents = self._default_agents_for_intent(intent)
+            agents = self.default_agents_for_intent(intent)
 
         # Retriever must always be first
         if "retriever" not in agents:
